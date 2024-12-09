@@ -32,20 +32,7 @@ const ResumePage = () => {
       languages: [],
       projects: [],
       skills: [],
-      socialMedias: [
-        {
-          icon: "",
-          name: "test1",
-          url: "test1",
-          username: "test1"
-        },
-        {
-          icon: "",
-          name: "test2",
-          url: "test2",
-          username: "test2"
-        }
-      ]
+      socialMedias: []
     }
   }
   const methods = useForm<ResumeData>({ defaultValues });
