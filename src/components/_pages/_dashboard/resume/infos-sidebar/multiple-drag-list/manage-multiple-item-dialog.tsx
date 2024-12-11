@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Dialog, { BaseDialogProps } from "@/components/ui/dialog/dialog";
 import { MultipleDragItemData, ResumeArrayKeys } from ".";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
-import { Fragment, useMemo } from "react";
+import { Fragment, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import InputField from "@/components/ui/input/field";
@@ -14,7 +15,8 @@ import { toast } from "sonner";
 
 type ManageMultipleItemDialogProps = BaseDialogProps & {
   data: MultipleDragItemData;
-  setOpen: (open: boolean) => void
+  setOpen: (open: boolean) => void;
+  initialData: any;
 }
 
 type FormConfig<T> = {
@@ -233,15 +235,66 @@ const formConfig: FormConfigObject = {
   ],
 };
 
-const ManageMultipleItemDialog = ({ data, open, setOpen }: ManageMultipleItemDialogProps) => {
-  const methods = useForm();
+const ManageMultipleItemDialog = ({ data, open, setOpen, initialData }: ManageMultipleItemDialogProps) => {
+  const methods = useForm({
+    defaultValues: {
+      name: "",
+      username: "",
+      url: "",
+      icon: "",
+      company: "",
+      position: "",
+      date: "",
+      location: "",
+      website: "",
+      summary: "",
+      degree: "",
+      institution: "",
+      description: "",
+      level: 0,
+      keywords: "",
+    }
+  });
   const { setValue, getValues } = useFormContext<ResumeData>()
+
+  const isEditing = !!initialData;
+
+  useEffect(() => {
+    if (initialData) {
+      methods.reset(initialData);
+    }
+  }, [initialData, methods])
+
+  const onDelete = () => {
+    const currentValue = getValues();
+    const formKey = data.formKey;
+    const currentFieldValue = currentValue.content[formKey] ?? []
+
+    const updatedItems = currentFieldValue.filter((item: any) => item.id !== initialData.id)
+    setValue(`content.${formKey}`, updatedItems);
+    setOpen(false);
+    toast.success("Item removido com sucesso!");
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = (formData: any) => {
     const currentValue = getValues();
     const formKey = data.formKey;
     const currentFieldValue = currentValue.content[formKey] ?? []
+
+    if (isEditing) {
+      const updatedItems = currentFieldValue.map((item: any) => {
+        if (item.id === initialData.id) {
+          return formData;
+        }
+        return item;
+      });
+
+      setValue(`content.${formKey}`, updatedItems);
+      setOpen(false);
+      toast.success("Item editado com sucesso!");
+      return;
+    }
 
     setValue(`content.${formKey}`, [...currentFieldValue, {
       ...formData,
@@ -311,8 +364,13 @@ const ManageMultipleItemDialog = ({ data, open, setOpen }: ManageMultipleItemDia
           </div>
 
           <div className="ml-auto flex gap-3">
+            {isEditing && (
+              <Button variant={"destructive"} onClick={onDelete}>
+                Remover
+              </Button>
+            )}
             <Button type="submit" className="w-max">
-              Adicionar
+              {isEditing ? "Salvar" : "Adicionar"}
             </Button>
           </div>
         </form>

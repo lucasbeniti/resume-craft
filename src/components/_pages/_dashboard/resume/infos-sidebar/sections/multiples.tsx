@@ -1,10 +1,13 @@
-import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Share2, BriefcaseBusiness, GraduationCap, BicepsFlexed, Languages, FileBadge2, Globe } from "lucide-react";
 import { Fragment, useState } from "react";
 import MultipleDragList, { MultipleDragItemData } from "../multiple-drag-list";
 import ManageMultipleItemDialog from "../multiple-drag-list/manage-multiple-item-dialog";
+import { useFormContext } from "react-hook-form";
+import { Separator } from "@/components/ui/separator";
 
 const MultiplesSections = () => {
+  const { getValues } = useFormContext();
+
   const [sectionToAdd, setSectionToAdd] = useState<MultipleDragItemData | null>(null)
   const sectionsKeys: MultipleDragItemData[] = [
     {
@@ -57,6 +60,16 @@ const MultiplesSections = () => {
       descriptionKey: "description",
     },
   ];
+
+  const [initialData, setInitialData] = useState<MultipleDragItemData | null>(null);
+  const onEdit = (section: MultipleDragItemData, index: number) => {
+    const currentValues = getValues();
+    const currentItems = currentValues.content[section.formKey]
+
+    setSectionToAdd(section);
+    setInitialData(currentItems[index]);
+  }
+
   return (
     <div>
       {sectionsKeys.map((section) => (
@@ -65,17 +78,19 @@ const MultiplesSections = () => {
           <MultipleDragList
             data={section}
             onAdd={() => { setSectionToAdd(section) }}
-            onEdit={() => { }}
+            onEdit={(index) => { onEdit(section, index) }}
           />
         </Fragment>
       ))}
 
       {sectionToAdd && (
         <ManageMultipleItemDialog
+          initialData={initialData}
           data={sectionToAdd}
           open={!!sectionToAdd}
           setOpen={(value) => {
             if (!value) {
+              setInitialData(null)
               setSectionToAdd(null);
             }
           }}
