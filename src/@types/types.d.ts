@@ -80,6 +80,28 @@ type ResumeContentData = {
   projects: Partial<ResumeProjectData>[];
 }
 
+type ResumeSections =| "summary"| "socialMedias"| "experiences"| "educations"| "skills"| "languages"| "certifications" |"projects";
+
+type ResumeLayoutSection = {
+  id?: string;
+  key: ResumeSections;
+}
+
+type ResumeLanguages = "english" | "spanish" | "portuguese" | "french" | "german" | "italian";
+
+type ResumeStructureData = {
+  template: ResumeTemplates;
+  colorTheme: string;
+  layout: {
+    mainSections: ResumeLayoutSection[],
+    sidebarSections: ResumeLayoutSection[]
+  };
+  language: ResumeLanguages
+}
+
 type ResumeData = { 
   content: ResumeContentData
+  structure: ResumeStructureData
 }
+
+type ResumeTemplates = "eevee" | "onix" | "jynx" | "ditto"
