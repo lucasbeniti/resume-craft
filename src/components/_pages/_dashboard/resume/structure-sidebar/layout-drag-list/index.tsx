@@ -74,6 +74,8 @@ const labels: Record<ResumeSections, Record<ResumeLanguages, string>> = {
   },
 };
 
+export const sectionLabels = labels;
+
 const LayoutDragList = ({ title, fields }: LayoutDragListProps) => {
   const { watch } = useFormContext();
   const language: ResumeLanguages = watch("structure.language");
